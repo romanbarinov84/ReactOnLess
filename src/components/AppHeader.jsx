@@ -1,9 +1,8 @@
-import { Layout, Select, Space, Button, Modal,Drawer } from "antd";
-import { useCrypto } from ".././context/crypto-context.jsx";
+import { Layout, Select, Space, Button, Modal, Drawer } from "antd";
+import { useCrypto } from "../context/crypto-context.jsx";
 import { useEffect, useState } from "react";
 import CoinInfoModal from "./CoinInfoModal.jsx";
-import AddAssetForm from "./AddAssetForm.jsx"
-
+import AddAssetForm from "./AddAssetForm.jsx";
 
 const headerStyle = {
   textAlign: "center",
@@ -18,9 +17,9 @@ const headerStyle = {
 
 export default function AppHeader() {
   const [select, setSelect] = useState(false);
-  const [coin, setCoin] = useState(null)
+  const [coin, setCoin] = useState(null);
   const [modal, setModal] = useState(false);
-  const [drawer, setDrawer] = useState(false)
+  const [drawer, setDrawer] = useState(false);
   const { crypto } = useCrypto();
 
   useEffect(() => {
@@ -34,7 +33,7 @@ export default function AppHeader() {
   }, []);
 
   function handleSelect(value) {
-    setCoin(crypto.find((c) => c.id === value))
+    setCoin(crypto.find((c) => c.id === value));
     setModal(true);
   }
 
@@ -47,24 +46,28 @@ export default function AppHeader() {
         open={select}
         onSelect={handleSelect}
         onClick={() => setSelect((prev) => !prev)}
-        value="press / to open"
+        value="Press / to open"
         options={crypto.map((coin) => ({
           label: coin.name,
           value: coin.id,
-          icon: coin.icon,
+          icon: coin.icon || "", // защита от ошибки, если нет иконки
         }))}
         optionRender={(option) => (
           <Space>
-            <img
-              style={{ width: 20 }}
-              src={option.data.icon}
-              alt={option.data.label}
-            />
+            {option.data.icon && (
+              <img
+                style={{ width: 20 }}
+                src={option.data.icon}
+                alt={option.data.label}
+              />
+            )}
             {option.data.label}
           </Space>
         )}
       />
-      <Button type="primary" onClick={() => setDrawer(true)}>Add Asset</Button>
+      <Button type="primary" onClick={() => setDrawer(true)}>
+        Add Asset
+      </Button>
 
       <Modal
         open={modal}
@@ -72,10 +75,16 @@ export default function AppHeader() {
         onCancel={() => setModal(false)}
         footer={null}
       >
-        <CoinInfoModal coin={coin}/>
+        <CoinInfoModal coin={coin} />
       </Modal>
-      <Drawer width={600} title="Add Asset" onClose={() => setDrawer(false)} open={drawer} destroyOnClose>
-       <AddAssetForm onClose={() => setDrawer(false)}/>
+      <Drawer
+        width={600}
+        title="Add Asset"
+        onClose={() => setDrawer(false)}
+        open={drawer}
+        destroyOnClose
+      >
+        <AddAssetForm onClose={() => setDrawer(false)} />
       </Drawer>
     </Layout.Header>
   );
